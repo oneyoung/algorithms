@@ -10,3 +10,4 @@ class TestSort(unittest.TestCase):
 
         self.assertListEqual(sort.insert_sort(deepcopy(ilist)), olist)
         self.assertListEqual(sort.merge_sort(deepcopy(ilist)), olist)
+        self.assertListEqual(sort.quick_sort(deepcopy(ilist)), olist)
