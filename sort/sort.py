@@ -73,3 +73,26 @@ def quick_sort2(array):
     return quick_sort2([lt for lt in array[1:] if lt < array[0]]) + \
         array[0:1] + \
         quick_sort2([gt for gt in array[1:] if gt > array[0]])
+
+
+def counting_sort(array):
+    # init a empty aux array
+    m = max(array)
+    n = min(array)
+
+    aux = [0] * (m - n + 1)
+    for a in array:  # get counting map
+        aux[a - n] += 1
+
+    # generate index map of aux
+    s = 0
+    for i in range(len(aux)):
+        s += aux[i]
+        aux[i] = s
+
+    ret = [0] * len(array)
+    for a in array:
+        i = a - n
+        ret[aux[i] - 1] = a
+        aux[i] -= 1
+    return ret

@@ -10,7 +10,8 @@ class TestSort(unittest.TestCase):
         self.funcs = ['insert_sort',
                       'merge_sort',
                       'quick_sort',
-                      'quick_sort2', ]
+                      'counting_sort',
+                      'quick_sort2',]
 
     def get_func(self, func):
         return sort.__dict__[func]
@@ -41,3 +42,6 @@ class TestSort(unittest.TestCase):
         for func in self.funcs:
             array = deepcopy(array0)
             print 'method %s spend %s' % (func, record_time(self.get_func(func), array))
+
+        array = deepcopy(array0)
+        print 'method %s spend %s' % ('list.sort', record_time(list.sort, array))
