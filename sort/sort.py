@@ -1,4 +1,5 @@
 import random
+import math
 
 
 def insert_sort(array):
@@ -91,8 +92,43 @@ def counting_sort(array):
         aux[i] = s
 
     ret = [0] * len(array)
-    for a in array:
+    for a in array[::-1]:
         i = a - n
         ret[aux[i] - 1] = a
         aux[i] -= 1
     return ret
+
+
+def radix_sort(array):
+    def csort(array, shift, mask):
+        '''
+        another type of counting sort.
+        picked by shift
+        '''
+        # init a empty aux array
+
+        aux = [0] * (mask + 1)
+        for a in array:  # get counting map
+            index = (a >> shift) & mask
+            aux[index] += 1
+
+        # generate index map of aux
+        s = 0
+        for i in range(len(aux)):
+            s += aux[i]
+            aux[i] = s
+
+        ret = [0] * len(array)
+        for a in array[::-1]:  # reverse iter make sure the order
+            i = (a >> shift) & mask
+            ret[aux[i] - 1] = a
+            aux[i] -= 1
+        return ret
+
+    r = int(math.log(len(array), 2))  # slicer
+    b = int(math.ceil(math.log(max(array), 2)))  # max bits
+    mask = (2 ** r) - 1
+    for i in range(int(b / r) + 1):
+        shift = i * r
+        array = csort(array, shift, mask)
+    return array

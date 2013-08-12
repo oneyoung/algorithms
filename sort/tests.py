@@ -11,14 +11,15 @@ class TestSort(unittest.TestCase):
                       'merge_sort',
                       'quick_sort',
                       'counting_sort',
-                      'quick_sort2',]
+                      'radix_sort',
+                      'quick_sort2', ]
 
     def get_func(self, func):
         return sort.__dict__[func]
 
     def test_sanity(self):
-        ilist = [2, 4, 1, 9, 7, 5, 3]
-        olist = [1, 2, 3, 4, 5, 7, 9]
+        ilist = [2, 4, 1, 9, 7, 5, 3, 2, 3]
+        olist = [1, 2, 2, 3, 3, 4, 5, 7, 9]
 
         for func in self.funcs:
             result = self.get_func(func)(deepcopy(ilist))
