@@ -71,7 +71,7 @@ def quick_sort2(array):
     '''
     if len(array) <= 1:
         return array
-    return quick_sort2([lt for lt in array[1:] if lt < array[0]]) + \
+    return quick_sort2([lt for lt in array[1:] if lt <= array[0]]) + \
         array[0:1] + \
         quick_sort2([gt for gt in array[1:] if gt > array[0]])
 
