@@ -132,3 +132,31 @@ def radix_sort(array):
         shift = i * r
         array = csort(array, shift, mask)
     return array
+
+
+def list_range(array):
+    '''
+    get the min and max of the list
+    array must not be empty
+    return (min, max)
+    -- time T(n) = 3*(n/2)
+    '''
+    length = len(array)
+    if length == 0:
+        raise Exception
+    if length % 2 == 0:
+        head = array[0:2]
+        m, n = head if head[0] > head[1] else head[::-1]
+        start = 2
+    else:
+        m = n = array[0]
+        start = 1
+
+    for i in range(start, length, 2):
+        x = array[i]
+        y = array[i + 1]
+        mi, ni = (x, y) if x > y else (y, x)
+        m = mi if mi > m else m
+        n = ni if ni < n else n
+
+    return (n, m)

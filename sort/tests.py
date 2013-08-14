@@ -25,6 +25,10 @@ class TestSort(unittest.TestCase):
             result = self.get_func(func)(deepcopy(ilist))
             self.assertListEqual(result, olist)
 
+        # test some misc func
+        self.assertTupleEqual(sort.list_range(ilist), (1, 9))
+        self.assertTupleEqual(sort.list_range([1, 9, 5, 6]), (1, 9))
+
     def test_runingtime(self):
         def record_time(func, array):
             start = time.time()
