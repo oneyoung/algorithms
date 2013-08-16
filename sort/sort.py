@@ -34,22 +34,23 @@ def merge_sort(array):
     return recursor(array)
 
 
+def partition(array, i_left, i_right, i_pivot):
+    pivot = array[i_pivot]
+    # first swap pivot to right most element
+    array[i_right], array[i_pivot] = array[i_pivot], array[i_right]
+    i_stored = i_left
+    for i in range(i_left, i_right):  # i_left <= i < i_right
+        if array[i] < pivot:  # if i < pivot, move to left side
+            array[i], array[i_stored] = array[i_stored], array[i]
+            i_stored += 1  # once we found a match, move 1 forward
+    array[i_stored], array[i_right] = array[i_right], array[i_stored]  # move back pivot
+    return i_stored  # return pivot index
+
+
 def quick_sort(array):
     '''
     in-place quick sort
     '''
-    def partition(array, i_left, i_right, i_pivot):
-        pivot = array[i_pivot]
-        # first swap pivot to right most element
-        array[i_right], array[i_pivot] = array[i_pivot], array[i_right]
-        i_stored = i_left
-        for i in range(i_left, i_right):  # i_left <= i < i_right
-            if array[i] < pivot:  # if i < pivot, move to left side
-                array[i], array[i_stored] = array[i_stored], array[i]
-                i_stored += 1  # once we found a match, move 1 forward
-        array[i_stored], array[i_right] = array[i_right], array[i_stored]  # move back pivot
-        return i_stored  # return pivot index
-
     def quicksort(array, i_left, i_right):
         if i_left < i_right:
             i_pivot = random.randint(i_left, i_right)  # choose a random pivot
@@ -160,3 +161,31 @@ def list_range(array):
         n = ni if ni < n else n
 
     return (n, m)
+
+
+def randomize_select(array, n):
+    '''
+    find out the nth big elements in a array
+    paras:
+        array -- should not have same elements
+        n -- index start from 1
+    '''
+    def func(array, i_left, i_right, nth):
+        if i_left == i_right:  # only one element left
+            return i_left
+
+        i_pivot = random.randint(i_left, i_right)  # choose a random pivot
+        i_pivot_new = partition(array, i_left, i_right, i_pivot)
+        if i_pivot_new == nth:  # we got the right index
+            return i_pivot_new
+        elif i_pivot_new > nth:
+            return func(array, i_left, i_pivot_new - 1, nth)
+        else:
+            return func(array, i_pivot_new + 1, i_right, nth)
+
+    length = len(array)
+    if length < n:
+        raise Exception
+    index = func(array, 0, length - 1, n - 1)
+
+    return array[index]

@@ -29,6 +29,12 @@ class TestSort(unittest.TestCase):
         self.assertTupleEqual(sort.list_range(ilist), (1, 9))
         self.assertTupleEqual(sort.list_range([1, 9, 5, 6]), (1, 9))
 
+        self.assertEqual(sort.randomize_select([2, 10, 8, 4, 7, -1], 3), 4)
+        array = range(1, 500)
+        random.shuffle(array)
+        self.assertEqual(sort.randomize_select(array, 111), 111)
+        array = range(500)
+
     def test_runingtime(self):
         def record_time(func, array):
             start = time.time()
