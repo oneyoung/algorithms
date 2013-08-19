@@ -46,6 +46,7 @@ class Tree():
         child_node = getattr(parent, child_name)
         if not child_node:  # child is none, we can place node here
             setattr(parent, child_name, node)
+            node.parent = parent
         else:
             self.add_as_child(child_node, node)
 
@@ -69,8 +70,63 @@ class Tree():
         else:
             return node  # key equal
 
+    def find_subtree2(self, key):
+        ''' non-recursive version '''
+        node = self.rootNode
+        while node and node.key != key:
+            if key < node.key:
+                node = node.leftChild
+            else:
+                node = node.rightChild
+        return node
+
     def find(self, key):
-        return self.find_subtree(self.rootNode, key)
+        #return self.find_subtree(self.rootNode, key)
+        return self.find_subtree2(key)
+
+    def _max(self, node):
+        if not node:  # empty tree
+            return None
+        while node.rightChild:
+            node = node.rightChild
+        return node
+
+    def _min(self, node):
+        if not node:  # empty tree
+            return None
+        while node.leftChild:
+            node = node.leftChild
+        return node
+
+    def max(self):
+        return self._max(self.rootNode)
+
+    def min(self):
+        return self._min(self.rootNode)
+
+    def successor(self, key):
+        node = self.find(key)
+        if not node:
+            return None
+        elif node.rightChild:  # has right child, then find the min one
+            return self._min(node.rightChild)
+        else:  # search upward, until parent has a right node.
+            node = node.parent
+            while node and not node.rightChild:
+                node = node.parent
+            return node
+
+    def predecessor(self, key):
+        node = self.find(key)
+        if not node:
+            return None
+        elif node.leftChild:
+            return self._max(node.leftChild)
+        else:
+            node = node.parent
+            while node and not node.leftChild:
+                node = node.parent
+            return node
 
     def inorder(self, node):
         ret = []
