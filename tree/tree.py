@@ -36,10 +36,10 @@ class Node():
 
 
 class Tree():
-    def __init__(self, nodes=[]):
+    def __init__(self, keys=[]):
         self.rootNode = None
-        for node in nodes:
-            self.insert(node)
+        for key in keys:
+            self.insert(key)
 
     def add_as_child(self, parent, node):
         child_name = 'leftChild' if node.key < parent.key else 'rightChild'
@@ -50,7 +50,8 @@ class Tree():
         else:
             self.add_as_child(child_node, node)
 
-    def insert(self, node):
+    def insert(self, node_or_key):
+        node = node_or_key if isinstance(node_or_key, Node) else Node(node_or_key)
         if self.rootNode:
             if not self.find(node.key):  # avoid duplicated add
                 self.add_as_child(self.rootNode, node)

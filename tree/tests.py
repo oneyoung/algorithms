@@ -1,11 +1,11 @@
 import unittest
-from tree import Node, BinarySearchTree
+from tree import BinarySearchTree
 
 
 class TestTree(unittest.TestCase):
     def test_sanity(self):
         array = [2, 3, 1, 7, 9, 5, 6, 11]
-        t = BinarySearchTree([Node(i) for i in array])
+        t = BinarySearchTree(array)
         self.assertTrue(t.sanity())
         self.assertEqual(t.height(), 5)
         self.assertListEqual([n.key for n in t.as_list()],
@@ -17,7 +17,7 @@ class TestTree(unittest.TestCase):
 
         # inster & deletion test
         length = len(t.as_list())
-        t.insert(Node(4))
+        t.insert(4)
         self.assertTrue(t.sanity())
         self.assertEqual(length + 1, len(t.as_list()))
         t.delete(5)
