@@ -145,8 +145,6 @@ class Tree(object):
 
         return check_subnode(self.rootNode)
 
-
-class BinarySearchTree(Tree):
     def add_as_child(self, parent, node):
         child_name = 'leftChild' if node.key < parent.key else 'rightChild'
         child_node = getattr(parent, child_name)
@@ -155,7 +153,54 @@ class BinarySearchTree(Tree):
             node.parent = parent
         else:
             self.add_as_child(child_node, node)
+        return node
 
+    def replace(self, old_child, new_child):
+        '''
+        replace old_child with new_child
+        '''
+        parent = old_child.parent
+        if parent:
+            if parent.key > old_child.key:  # left child
+                parent.leftChild = new_child
+            else:
+                parent.rightChild = new_child
+        else:  # old_child is root node
+            self.rootNode = new_child
+        if new_child:  # update parent is necessary
+            new_child.parent = parent
+
+    def rotate(self, key_or_node, dirt='right'):
+        ''' right/left rotate node
+        para:
+            node -- upper node to be rotated
+            dirt -- direction, left/right
+        '''
+        node = key_or_node if isinstance(key_or_node, Node) \
+            else self.find(key_or_node)
+        #       P                   P
+        #       |                   |
+        #       B      right        A
+        #      / \     ------>     / \
+        #     A   c    <------    a   B
+        #    / \        left         / \
+        #   a   b                   b   c
+        child_branch, b_branch = ('leftChild', 'rightChild') if dirt == 'right' \
+            else ('rightChild', 'leftChild')
+        child = getattr(node, child_branch)
+        assert child  # child should exists
+        # get b node in above figure
+        b = getattr(child, b_branch)
+        # swap A & B, take right rotate for example
+        # node is B, and child is A
+        self.replace(node, child)  # delete B (right rotate)
+        self.replace(b, node)  # then replace b with B
+        # we can't use replace now, since A's parent has changed
+        b.parent = node
+        setattr(node, child_branch, b)
+
+
+class BinarySearchTree(Tree):
     def insert(self, node_or_key):
         node = node_or_key if isinstance(node_or_key, Node) else Node(node_or_key)
         if self.rootNode:
@@ -165,34 +210,19 @@ class BinarySearchTree(Tree):
             self.rootNode = node
 
     def delete(self, key):
-        def replace(old_child, new_child):
-            '''
-            replace old_child with new_child
-            '''
-            parent = old_child.parent
-            if parent:
-                if parent.key > old_child.key:  # left child
-                    parent.leftChild = new_child
-                else:
-                    parent.rightChild = new_child
-            else:  # old_child is root node
-                self.rootNode = new_child
-            if new_child:  # update parent is necessary
-                new_child.parent = parent
-
         node = self.find(key)
         if node:
             if node.rightChild is None and node.leftChild is None:  # leaf
-                replace(node, None)
+                self.replace(node, None)
             elif node.rightChild is None or node.leftChild is None:
                 # has one child
                 child = node.rightChild if node.rightChild else node.leftChild
-                replace(node, child)
+                self.replace(node, child)
             else:  # has both children
                 successor = self.successor(node.key)
                 node.key = successor.key  # replace with successor
                 # del successor (the successor only rightChild, so replace this
                 # child equal to del successor)
-                replace(successor, successor.rightChild)
+                self.replace(successor, successor.rightChild)
         else:  # node not found
             return
