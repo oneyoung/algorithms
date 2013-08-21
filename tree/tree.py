@@ -1,4 +1,4 @@
-class Node():
+class Node(object):
     def __init__(self, key):
         self.key = key
         self.parent = None
@@ -25,7 +25,7 @@ class Node():
         return (self.leftChild.height if self.leftChild else -1) - (self.rightChild.height if self.rightChild else -1)
 
 
-class Tree():
+class Tree(object):
     def __init__(self, keys=[]):
         self.rootNode = None
         for key in keys:
