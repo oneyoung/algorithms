@@ -4,7 +4,11 @@ from tree import Node, Tree
 class NodeRB(Node):
     def __init__(self, key):
         self.color = 'B'  # 'B' -- Black node, 'R' -- Red node
-        super(Node, self).__init__(key)
+        super(NodeRB, self).__init__(key)
+        # for a non-nil node, it should has two nil children at init
+        if not self.is_nil():
+            self.leftChild = nil
+            self.rightChild = nil
 
     def __nonzero__(self):
         '''
@@ -17,7 +21,7 @@ class NodeRB(Node):
         return str(self.key) + "(%s.%s)" % (self.color, str(self.height))
 
     def is_nil(self):
-        return not(self.key is None)
+        return self.key is None
 
     @property
     def bheight(self):
@@ -36,12 +40,28 @@ nil = NodeRB(None)  # obj to present all nil node
 
 
 class RBTree(Tree):
+    def insert(self, key):
+        node = NodeRB(key)
+        if self.rootNode is None:
+            self.rootNode = node
+        else:
+            # first, insert node in BST tree
+            node = self.add_as_child(self.rootNode, node)
+            # fix RB-Tree proterty
+            self.fix_rb_prop(node)
+
+    def fix_rb_prop(self, node):
+        pass
+
+    def add_as_child(self, parent, node):
+        pass
+
     def sanity(self):
         if self.rootNode is None:  # empty Tree
             return True
         try:
             # first should satisfy Binary Search property
-            assert super(Tree, self).sanity(), 'BST rule not satisfied'
+            assert super(RBTree, self).sanity(), 'BST rule not satisfied'
 
             # test RB-Tree property
             def check_node(node):
@@ -55,11 +75,11 @@ class RBTree(Tree):
                     return  # nil indicate leaf of Tree
                 # Every simple path from a given node to any of its descendant
                 # leaves contains the same number of black nodes.
-                assert node.leftChild.bheight == node.rightChild.bheight, 'subtree has diff height'
+                assert node.leftChild.bheight == node.rightChild.bheight, '%s subtree has diff height' % node
                 # Every red node must have two black child nodes.
                 if node.color == 'R':
-                    assert node.leftChild.color == 'B', 'left child is not black'
-                    assert node.rightChild.color == 'B', 'right child is not black'
+                    assert node.leftChild.color == 'B', '%s left child is not black' % node
+                    assert node.rightChild.color == 'B', '% right child is not black' % node
                 # traverse subnode
                 check_node(node.leftChild)
                 check_node(node.rightChild)
