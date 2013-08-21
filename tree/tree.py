@@ -21,16 +21,6 @@ class Node():
     def is_leaf(self):
         return (self.height == 0)
 
-    def max_children_height(self):
-        if self.leftChild and self.rightChild:
-            return max(self.leftChild.height, self.rightChild.height)
-        elif self.leftChild and not self.rightChild:
-            return self.leftChild.height
-        elif not self.leftChild and self.rightChild:
-            return self.rightChild.height
-        else:
-            return -1
-
     def balance(self):
         return (self.leftChild.height if self.leftChild else -1) - (self.rightChild.height if self.rightChild else -1)
 
@@ -41,82 +31,9 @@ class Tree():
         for key in keys:
             self.insert(key)
 
-    def add_as_child(self, parent, node):
-        child_name = 'leftChild' if node.key < parent.key else 'rightChild'
-        child_node = getattr(parent, child_name)
-        if not child_node:  # child is none, we can place node here
-            setattr(parent, child_name, node)
-            node.parent = parent
-        else:
-            self.add_as_child(child_node, node)
-
-    def insert(self, node_or_key):
-        node = node_or_key if isinstance(node_or_key, Node) else Node(node_or_key)
-        if self.rootNode:
-            if not self.find(node.key):  # avoid duplicated add
-                self.add_as_child(self.rootNode, node)
-        else:
-            self.rootNode = node
-
-    def delete(self, key):
-        def replace(old_child, new_child):
-            '''
-            replace old_child with new_child
-            '''
-            parent = old_child.parent
-            if parent:
-                if parent.key > old_child.key:  # left child
-                    parent.leftChild = new_child
-                else:
-                    parent.rightChild = new_child
-            else:  # old_child is root node
-                self.rootNode = new_child
-            if new_child:  # update parent is necessary
-                new_child.parent = parent
-
-        node = self.find(key)
-        if node:
-            if node.rightChild is None and node.leftChild is None:  # leaf
-                replace(node, None)
-            elif node.rightChild is None or node.leftChild is None:
-                # has one child
-                child = node.rightChild if node.rightChild else node.leftChild
-                replace(node, child)
-            else:  # has both children
-                successor = self.successor(node.key)
-                node.key = successor.key  # replace with successor
-                # del successor (the successor only rightChild, so replace this
-                # child equal to del successor)
-                replace(successor, successor.rightChild)
-        else:  # node not found
-            return
-
-    def sanity(self):
-        ''' check if remain the binary tree property '''
-        def node_cmp(node1, node2, ops):
-            if node1 is None or node2 is None:
-                return True
-            else:
-                return eval("%d %s 0" % (cmp(node1.key, node2.key), ops))
-
-        def check_parent(node):
-            ''' node must not be None '''
-            return (node.leftChild.parent == node if node.leftChild else True) and \
-                (node.rightChild.parent == node if node.rightChild else True)
-
-        def check_subnode(node):
-            if node:
-                if not node_cmp(node, node.leftChild, '>'):
-                    return False
-                if not node_cmp(node, node.rightChild, '<'):
-                    return False
-                return check_subnode(node.leftChild) and \
-                    check_subnode(node.rightChild) and \
-                    check_parent(node)
-            else:  # leaf
-                return True
-
-        return check_subnode(self.rootNode)
+    def insert(self, key):
+        '''override this function'''
+        pass
 
     def height(self):
         return self.rootNode.height if self.rootNode else 0
@@ -201,6 +118,81 @@ class Tree():
     def as_list(self):
         return self.inorder(self.rootNode)
 
+    def sanity(self):
+        ''' check if remain the binary tree property '''
+        def node_cmp(node1, node2, ops):
+            if not node1 or not node2:
+                return True
+            else:
+                return eval("%d %s 0" % (cmp(node1.key, node2.key), ops))
+
+        def check_parent(node):
+            ''' node must not be None '''
+            return (node.leftChild.parent == node if node.leftChild else True) and \
+                (node.rightChild.parent == node if node.rightChild else True)
+
+        def check_subnode(node):
+            if node:
+                if not node_cmp(node, node.leftChild, '>'):
+                    return False
+                if not node_cmp(node, node.rightChild, '<'):
+                    return False
+                return check_subnode(node.leftChild) and \
+                    check_subnode(node.rightChild) and \
+                    check_parent(node)
+            else:  # leaf
+                return True
+
+        return check_subnode(self.rootNode)
+
 
 class BinarySearchTree(Tree):
-    pass
+    def add_as_child(self, parent, node):
+        child_name = 'leftChild' if node.key < parent.key else 'rightChild'
+        child_node = getattr(parent, child_name)
+        if not child_node:  # child is none, we can place node here
+            setattr(parent, child_name, node)
+            node.parent = parent
+        else:
+            self.add_as_child(child_node, node)
+
+    def insert(self, node_or_key):
+        node = node_or_key if isinstance(node_or_key, Node) else Node(node_or_key)
+        if self.rootNode:
+            if not self.find(node.key):  # avoid duplicated add
+                self.add_as_child(self.rootNode, node)
+        else:
+            self.rootNode = node
+
+    def delete(self, key):
+        def replace(old_child, new_child):
+            '''
+            replace old_child with new_child
+            '''
+            parent = old_child.parent
+            if parent:
+                if parent.key > old_child.key:  # left child
+                    parent.leftChild = new_child
+                else:
+                    parent.rightChild = new_child
+            else:  # old_child is root node
+                self.rootNode = new_child
+            if new_child:  # update parent is necessary
+                new_child.parent = parent
+
+        node = self.find(key)
+        if node:
+            if node.rightChild is None and node.leftChild is None:  # leaf
+                replace(node, None)
+            elif node.rightChild is None or node.leftChild is None:
+                # has one child
+                child = node.rightChild if node.rightChild else node.leftChild
+                replace(node, child)
+            else:  # has both children
+                successor = self.successor(node.key)
+                node.key = successor.key  # replace with successor
+                # del successor (the successor only rightChild, so replace this
+                # child equal to del successor)
+                replace(successor, successor.rightChild)
+        else:  # node not found
+            return
