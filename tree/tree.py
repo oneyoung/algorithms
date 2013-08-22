@@ -194,10 +194,12 @@ class Tree(object):
         # swap A & B, take right rotate for example
         # node is B, and child is A
         self.replace(node, child)  # delete B (right rotate)
-        self.replace(b, node)  # then replace b with B
-        # we can't use replace now, since A's parent has changed
-        b.parent = node
+        # here is tricky part, what is b is nil
+        setattr(child, b_branch, node)
+        node.parent = child
         setattr(node, child_branch, b)
+        if b:
+            b.parent = node
 
 
 class BinarySearchTree(Tree):
