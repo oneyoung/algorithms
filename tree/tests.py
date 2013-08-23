@@ -32,8 +32,10 @@ class TestTree(unittest.TestCase):
         # test rotate
         t = BinarySearchTree([10, 7, 5, 8, 4, 6])
         t.rotate(7, 'right')
+        self.assertEqual(6, len(t.as_list()))
         self.assertTrue(t.sanity())
         t.rotate(5, 'left')
+        self.assertEqual(6, len(t.as_list()))
         self.assertTrue(t.sanity())
         from rbtree import RBTree
         check_tree_sanity(RBTree)
