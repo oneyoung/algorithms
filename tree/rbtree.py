@@ -7,8 +7,10 @@ class RBNode(Node):
         super(RBNode, self).__init__(key)
         # for a non-nil node, it should has two nil children at init
         if not self.is_nil():
-            self.leftChild = nil
-            self.rightChild = nil
+            self.leftChild = RBNode(None, color='B')
+            self.leftChild.parent = self
+            self.rightChild = RBNode(None, color='B')
+            self.rightChild.parent = self
 
     def __nonzero__(self):
         '''
@@ -41,8 +43,6 @@ class RBNode(Node):
                 # height, so we just pick leftChild now
                 return h + valid + depth(node.leftChild, h)
         return depth(self, 0)
-
-nil = RBNode(None, color='B')  # obj to present all nil node
 
 
 class RBTree(Tree):

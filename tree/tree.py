@@ -145,7 +145,7 @@ class Tree(object):
                 (node.rightChild.parent == node if node.rightChild else True)
 
         def check_subnode(node):
-            if node:
+            if node is not None:  # we also want to check nil node
                 assert node_cmp(node, node.leftChild, '>'), \
                     '%s illegal leftChild %s' % (node, node.leftChild)
                 assert node_cmp(node, node.rightChild, '<'), \
@@ -153,8 +153,6 @@ class Tree(object):
                 assert check_parent(node), '%s illegal as parent node' % node
                 check_subnode(node.leftChild)
                 check_subnode(node.rightChild)
-            else:  # leaf
-                pass
 
         try:
             check_subnode(self.rootNode)
@@ -186,7 +184,8 @@ class Tree(object):
                 parent.rightChild = new_child
         else:  # old_child is root node
             self.rootNode = new_child
-        if new_child:  # update parent is necessary
+        if new_child is not None:
+            # update parent is necessary, compatible with Nil node
             new_child.parent = parent
 
     def rotate(self, key_or_node, dirt='right'):
