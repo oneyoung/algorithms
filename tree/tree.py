@@ -21,6 +21,14 @@ class Node(object):
     def is_leaf(self):
         return (self.height == 0)
 
+    def as_tree(self):
+        if self.is_leaf():
+            return str(self)
+        else:
+            left = self.leftChild.as_tree() if self.leftChild else self.leftChild
+            right = self.rightChild.as_tree() if self.rightChild else self.rightChild
+            return str(self) + '[%s|%s]' % (left, right)
+
     def balance(self):
         return (self.leftChild.height if self.leftChild else -1) - (self.rightChild.height if self.rightChild else -1)
 
@@ -88,23 +96,25 @@ class Tree(object):
             return None
         elif node.rightChild:  # has right child, then find the min one
             return self._min(node.rightChild)
-        else:  # search upward, until parent has a right node.
-            node = node.parent
-            while node and not node.rightChild:
+        else:
+            # search upward, until node is leftChild of its parent, or reach
+            # root node. The parent is the successor
+            while node.parent and node != node.parent.leftChild:
                 node = node.parent
-            return node
+            # if node is root, we should return node instead of its parent
+            return node.parent if node.parent else node
 
     def predecessor(self, key):
+        # much like successor
         node = self.find(key)
         if not node:
             return None
         elif node.leftChild:
             return self._max(node.leftChild)
         else:
-            node = node.parent
-            while node and not node.leftChild:
+            while node.parent and node != node.parent.rightChild:
                 node = node.parent
-            return node
+            return node.parent if node.parent else node
 
     def inorder(self, node):
         ret = []

@@ -5,27 +5,41 @@ class TestTree(unittest.TestCase):
     def test_sanity(self):
         def check_tree_sanity(cls):
             array = [2, 3, 1, 7, 9, 5, 6, 11]
+            array_sorted = [1, 2, 3, 5, 6, 7, 9, 11]
             t = cls(array)
             self.assertTrue(t.sanity())
             #self.assertEqual(t.height(), 5)
-            self.assertListEqual([n.key for n in t.as_list()],
-                                 [1, 2, 3, 5, 6, 7, 9, 11])
+            self.assertListEqual([n.key for n in t.as_list()], array_sorted)
             self.assertEqual(t.max().key, 11)
             self.assertEqual(t.min().key, 1)
-            self.assertEqual(t.successor(5).key, 6)
-            self.assertEqual(t.predecessor(7).key, 6)
+            # test predecessor and successor
+            for i in range(len(array_sorted)):
+                if i != 0:  # test predecessor
+                    self.assertEqual(t.predecessor(array_sorted[i]).key,
+                                     array_sorted[i - 1])
+                if i != len(array_sorted) - 1:  # test successor
+                    self.assertEqual(t.successor(array_sorted[i]).key,
+                                     array_sorted[i + 1])
 
             # inster & deletion test
             length = len(t.as_list())
-            t.insert(4)
+            key = 4
+            t.insert(key)
             self.assertTrue(t.sanity())
             self.assertEqual(length + 1, len(t.as_list()))
-            t.delete(5)
+            self.assertTrue(t.find(key))
+
+            key = 5
+            t.delete(key)
             self.assertTrue(t.sanity())
             self.assertEqual(length, len(t.as_list()))
-            t.delete(7)
+            self.assertFalse(t.find(key))  # key should gone
+
+            key = 7
+            t.delete(key)
             self.assertTrue(t.sanity())
             self.assertEqual(length - 1, len(t.as_list()))
+            self.assertFalse(t.find(key))
 
         from tree import BinarySearchTree
         check_tree_sanity(BinarySearchTree)
