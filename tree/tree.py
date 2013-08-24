@@ -223,14 +223,13 @@ class Tree(object):
         ''' delete one node from tree
         return node deleted and its child who replace the node
         '''
-        if (not node.rightChild) and (not node.leftChild):
+        if (not node.rightChild) or (not node.leftChild):
             # case 1: node is left, just delete it.
             # Note: in order to complicate with nil node, we should not just
             # replace with None, its child instead
-            child = node.rightChild
-            self.replace(node, child)
-        elif (not node.rightChild) or (not node.leftChild):
             # case 2: just has one child, replace current with its child
+
+            # in fact, we can merge case 1 & 2 into just one routine
             child = node.rightChild if node.rightChild else node.leftChild
             self.replace(node, child)
         else:
