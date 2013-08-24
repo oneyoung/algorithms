@@ -1,4 +1,5 @@
 import unittest
+import random
 
 
 class TestTree(unittest.TestCase):
@@ -22,24 +23,20 @@ class TestTree(unittest.TestCase):
                                      array_sorted[i + 1])
 
             # inster & deletion test
-            length = len(t.as_list())
-            key = 4
-            t.insert(key)
-            self.assertTrue(t.sanity())
-            self.assertEqual(length + 1, len(t.as_list()))
-            self.assertTrue(t.find(key))
+            for key in [8, 4, 20, 100, 12, 10]:
+                t.insert(key)
+                self.assertTrue(t.sanity())
+                self.assertTrue(t.find(key))  # should find the key
 
-            key = 5
-            t.delete(key)
-            self.assertTrue(t.sanity())
-            self.assertEqual(length, len(t.as_list()))
-            self.assertFalse(t.find(key))  # key should gone
-
-            key = 7
-            t.delete(key)
-            self.assertTrue(t.sanity())
-            self.assertEqual(length - 1, len(t.as_list()))
-            self.assertFalse(t.find(key))
+            keys = [n.key for n in t.as_list()]
+            random.shuffle(keys)
+            length = len(keys)
+            for key in keys:
+                t.delete(key)
+                length -= 1
+                self.assertTrue(t.sanity())
+                self.assertEqual(length, len(t.as_list()))
+                self.assertFalse(t.find(key))  # key should gone
 
         from tree import BinarySearchTree
         check_tree_sanity(BinarySearchTree)

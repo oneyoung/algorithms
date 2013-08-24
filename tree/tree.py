@@ -27,7 +27,10 @@ class Node(object):
         else:
             left = self.leftChild.as_tree() if self.leftChild else self.leftChild
             right = self.rightChild.as_tree() if self.rightChild else self.rightChild
-            return str(self) + '[%s|%s]' % (left, right)
+            if left or right:
+                return str(self) + '[%s|%s]' % (left, right)
+            else:
+                return str(self)
 
     def balance(self):
         return (self.leftChild.height if self.leftChild else -1) - (self.rightChild.height if self.rightChild else -1)
@@ -126,7 +129,7 @@ class Tree(object):
         return ret
 
     def as_list(self):
-        return self.inorder(self.rootNode)
+        return self.inorder(self.rootNode) if self.rootNode else []
 
     def sanity(self):
         ''' check if remain the binary tree property '''
@@ -143,17 +146,23 @@ class Tree(object):
 
         def check_subnode(node):
             if node:
-                if not node_cmp(node, node.leftChild, '>'):
-                    return False
-                if not node_cmp(node, node.rightChild, '<'):
-                    return False
-                return check_subnode(node.leftChild) and \
-                    check_subnode(node.rightChild) and \
-                    check_parent(node)
+                assert node_cmp(node, node.leftChild, '>'), \
+                    '%s illegal leftChild %s' % (node, node.leftChild)
+                assert node_cmp(node, node.rightChild, '<'), \
+                    '%s illegal rightChild %s' % (node, node.rightChild)
+                assert check_parent(node), '%s illegal as parent node' % node
+                check_subnode(node.leftChild)
+                check_subnode(node.rightChild)
             else:  # leaf
-                return True
+                pass
 
-        return check_subnode(self.rootNode)
+        try:
+            check_subnode(self.rootNode)
+            return True
+        except AssertionError as e:
+            print 'Tree:', self.rootNode.as_tree()
+            print str(e)
+            return False
 
     def add_as_child(self, parent, node):
         child_name = 'leftChild' if node.key < parent.key else 'rightChild'
@@ -211,6 +220,37 @@ class Tree(object):
         if b:
             b.parent = node
 
+    def delete_node(self, node):
+        ''' delete one node from tree
+        return node deleted and its child who replace the node
+        '''
+        if (not node.rightChild) and (not node.leftChild):
+            # case 1: node is left, just delete it.
+            # Note: in order to complicate with nil node, we should not just
+            # replace with None, its child instead
+            child = node.rightChild
+            self.replace(node, child)
+        elif (not node.rightChild) or (not node.leftChild):
+            # case 2: just has one child, replace current with its child
+            child = node.rightChild if node.rightChild else node.leftChild
+            self.replace(node, child)
+        else:
+            # case 3: has both children
+            # swap key with one's successor don't change the BST property.
+            # so delete successor with key exchanged instead. And it turn to
+            # the same as case 2
+            successor = self.successor(node.key)
+            # del successor (the successor only rightChild, so replace this
+            # child equal to del successor)
+            self.replace(successor, successor.rightChild)
+            # !!!Note: we should swap key after replacement, since such action
+            # will break the Tree property
+            node.key, successor.key = successor.key, node.key
+            # fill return value
+            node = successor
+            child = successor.rightChild
+        return (node, child)
+
 
 class BinarySearchTree(Tree):
     def insert(self, node_or_key):
@@ -224,17 +264,6 @@ class BinarySearchTree(Tree):
     def delete(self, key):
         node = self.find(key)
         if node:
-            if node.rightChild is None and node.leftChild is None:  # leaf
-                self.replace(node, None)
-            elif node.rightChild is None or node.leftChild is None:
-                # has one child
-                child = node.rightChild if node.rightChild else node.leftChild
-                self.replace(node, child)
-            else:  # has both children
-                successor = self.successor(node.key)
-                node.key = successor.key  # replace with successor
-                # del successor (the successor only rightChild, so replace this
-                # child equal to del successor)
-                self.replace(successor, successor.rightChild)
+            self.delete_node(node)
         else:  # node not found
             return
