@@ -135,6 +135,35 @@ def radix_sort(array):
     return array
 
 
+def bucket_sort(array, size=10):
+    ''' bucker sort
+    para:
+        array -- list to be sorted
+        size -- size of bucket, default is 10
+    '''
+    # init empty buckets
+    # should not use [[]] * size, because inner [] refer to the same empty
+    # list, so each insert to that list would apply to all lists
+    buckets = [[] for i in range(size)]
+
+    # here we want to build a generic bucket sort apply to any intergers, so
+    # need to figure out the range of the array
+    n, m = list_range(array)
+    stride = int(math.ceil((m - n) / float(size)))  # need a ceil here
+
+    # fill in the buckets
+    for i in array:
+        index = int((i - n) / stride)  # choose which bucket to append
+        buckets[index].append(i)
+
+    # sort elements in each bucket
+    for bucket in buckets:
+        insert_sort(bucket)
+
+    # concate each buckets into one array, and return
+    return sum(buckets, [])
+
+
 def list_range(array):
     '''
     get the min and max of the list

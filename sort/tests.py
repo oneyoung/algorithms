@@ -12,10 +12,17 @@ class TestSort(unittest.TestCase):
                       'quick_sort',
                       'counting_sort',
                       'radix_sort',
+                      'bucket_sort',
                       'quick_sort2', ]
 
     def get_func(self, func):
         return sort.__dict__[func]
+
+    def check_sorted(self, array):
+        prev = array[0]
+        for i in range(len(array)):
+            assert prev <= array[i], \
+                '%s: index %s smaller than previous' % (array, prev, i)
 
     def test_sanity(self):
         ilist = [2, 4, 1, 9, 7, 5, 3, 2, 3]
@@ -33,7 +40,10 @@ class TestSort(unittest.TestCase):
         array = range(1, 500)
         random.shuffle(array)
         self.assertEqual(sort.randomize_select(array, 111), 111)
+
         array = range(500)
+        random.shuffle(array)
+        self.check_sorted(sort.bucket_sort(array))
 
     def test_runingtime(self):
         def record_time(func, array):
