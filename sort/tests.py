@@ -45,6 +45,18 @@ class TestSort(unittest.TestCase):
         random.shuffle(array)
         self.check_sorted(sort.bucket_sort(array))
 
+        # heap test
+        from heap import Heap
+        h = Heap(deepcopy(ilist))
+        h.sanity()
+        self.assertListEqual(h.sort(), olist)
+        # big array test
+        array = range(500)
+        random.shuffle(array)
+        h = Heap(array)
+        h.sanity()
+        self.check_sorted(h.sort())
+
     def test_runingtime(self):
         def record_time(func, array):
             start = time.time()
