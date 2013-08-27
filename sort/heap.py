@@ -95,6 +95,8 @@ class Heap(object):
 
         return result
 
+
+class PriorityQueue(Heap):
     def find_top(self):
         '''find max or min element depends on type of tree'''
         assert len(self.heap) > 1, 'empty heap'
@@ -102,7 +104,40 @@ class Heap(object):
 
     def pop_top(self):
         ''' pop max or min element depends on type of tree '''
-        assert len(self.heap) > 1, 'empty heap'
-        top = self.heap.pop(1)
+        heap = self.heap
+        end = len(heap) - 1
+        assert end > 0, 'empty heap'
+        # swap head and tail, this is like *heap sort*
+        heap[1], heap[end] = heap[end], heap[1]
+        top = heap.pop(end)
         self.heapify(1)
         return top
+
+    def update_key(self, i, key):
+        ''' update rank i element to key
+        (key must greater[max queue] or smaller[min queue] then prevous value)
+        '''
+        heap = self.heap
+        assert i < len(heap), 'heap overflow'
+        orig = heap[i]
+        heap[i] = key
+        if self.cmp(key, orig):  # go upwards
+            p = iparent(i)
+            # swap with parent until heap property meets or reach the top
+            while i > 1 and self.cmp(heap[i], heap[p]):
+                heap[i], heap[p] = heap[p], heap[i]
+                i = p
+                p = iparent(i)
+        else:  # downwards
+            self.heapify(i)
+
+    def insert_key(self, key):
+        heap = self.heap
+        heap.append(key)  # append to tail
+        # that means we must go upwards if necessary
+        i = len(heap) - 1
+        p = iparent(i)
+        while i > 1 and self.cmp(heap[i], heap[p]):
+            heap[i], heap[p] = heap[p], heap[i]
+            i = p
+            p = iparent(i)
