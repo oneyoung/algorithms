@@ -50,6 +50,10 @@ class TestSort(unittest.TestCase):
         h = Heap(deepcopy(ilist))
         h.sanity()
         self.assertListEqual(h.sort(), olist)
+        # min heap
+        h = Heap(deepcopy(ilist), htype='min')
+        h.sanity()
+        self.assertListEqual(h.sort(), olist[::-1])
         # big array test
         array = range(500)
         random.shuffle(array)

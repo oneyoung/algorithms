@@ -21,13 +21,13 @@ class Heap(object):
         # 2. parent and child can be indexed as above
         # 3. node must >= its child (max heap), or otherwise (min heap)
         # example:
-        #                    200[0]
+        #                    200[1]
         #                    /  \
-        #                  17[1] 50[2]
+        #                  17[2] 50[3]
         #                 /  \   /   \
-        #            13[3] 3[4] 25[5] 5[6]
+        #            13[4] 3[5] 25[6] 5[7]
         #           /   \
-        #         9[7]  7[8]
+        #         9[8]  7[9]
         heap = self.heap
         length = len(self.heap)
         i = 1
@@ -97,9 +97,12 @@ class Heap(object):
 
     def find_top(self):
         '''find max or min element depends on type of tree'''
-        return self.heap[1] if len(self.heap) > 1 else None
+        assert len(self.heap) > 1, 'empty heap'
+        return self.heap[1]
 
-    def delete_top(self):
-        ''' delete max or min element depends on type of tree '''
-        if len(self.heap) > 1:
-            self.heap.pop(1)
+    def pop_top(self):
+        ''' pop max or min element depends on type of tree '''
+        assert len(self.heap) > 1, 'empty heap'
+        top = self.heap.pop(1)
+        self.heapify(1)
+        return top
