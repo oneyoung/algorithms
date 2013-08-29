@@ -114,9 +114,7 @@ class PriorityQueue(Heap):
         return top
 
     def update_key(self, i, key):
-        ''' update rank i element to key
-        (key must greater[max queue] or smaller[min queue] then prevous value)
-        '''
+        ''' update rank i element to key '''
         heap = self.heap
         assert i < len(heap), 'heap overflow'
         orig = heap[i]
