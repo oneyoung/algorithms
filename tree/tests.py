@@ -65,3 +65,19 @@ class TestTree(unittest.TestCase):
         less.sanity()
         assert all([n.key >= s for n in more.as_list()])
         assert all([n.key <= s for n in less.as_list()])
+
+    def test_skiplist(self):
+        from skiplist import SkipList
+        array = range(100)
+        random.shuffle(array)
+        slist = SkipList(array)
+        self.assertTrue(slist.find(50))
+
+        keys = [n.key for n in slist.as_list()]
+        random.shuffle(keys)
+        length = len(keys)
+        for key in keys:
+            slist.delete(key)
+            length -= 1
+            self.assertEqual(length, len(slist.as_list()))
+            self.assertFalse(slist.find(key))  # key should gone
