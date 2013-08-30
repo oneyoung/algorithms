@@ -19,7 +19,7 @@ class Node(object):
         return depth(self, 0)
 
     def is_leaf(self):
-        return (self.height == 0)
+        return (self.height == 1)
 
     def as_tree(self):
         if self.is_leaf():
@@ -37,10 +37,20 @@ class Node(object):
 
 
 class Tree(object):
-    def __init__(self, keys=[]):
-        self.rootNode = None
-        for key in keys:
-            self.insert(key)
+    def __init__(self, keys=[], root=None):
+        if root:
+            # directly init from rootNode
+            self.rootNode = root
+        else:
+            self.rootNode = None
+            for key in keys:
+                self.insert(key)
+
+    def __str__(self):
+        if self.rootNode:
+            return self.rootNode.as_tree()
+        else:
+            return 'Empty Tree'
 
     def insert(self, key):
         '''override this function'''

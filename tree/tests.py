@@ -48,5 +48,20 @@ class TestTree(unittest.TestCase):
         t.rotate(5, 'left')
         self.assertEqual(6, len(t.as_list()))
         self.assertTrue(t.sanity())
+
         from rbtree import RBTree
         check_tree_sanity(RBTree)
+
+        # treap test
+        from treap import Treap
+        check_tree_sanity(Treap)
+        # split
+        array = [1, 5, 89, 37, 897, 32, 39, 9, 2, 68, 234, 7, 66, 99]
+        t = Treap(array)
+        t.sanity()
+        s = 50
+        less, more = t.split(s)
+        more.sanity()
+        less.sanity()
+        assert all([n.key >= s for n in more.as_list()])
+        assert all([n.key <= s for n in less.as_list()])
