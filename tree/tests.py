@@ -81,3 +81,13 @@ class TestTree(unittest.TestCase):
             length -= 1
             self.assertEqual(length, len(slist.as_list()))
             self.assertFalse(slist.find(key))  # key should gone
+
+    def test_btree(self):
+        from btree import BTree
+        r = 500
+        array = range(r)
+        random.shuffle(array)
+        t = BTree(8, array)
+        self.assertTrue(t.sanity())
+        self.assertListEqual(t.as_list(), range(r))
+        self.assertTrue(t.find(100))
