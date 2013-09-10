@@ -91,3 +91,13 @@ class TestTree(unittest.TestCase):
         self.assertTrue(t.sanity())
         self.assertListEqual(t.as_list(), range(r))
         self.assertTrue(t.find(100))
+
+        keys = t.as_list()
+        random.shuffle(keys)
+        length = len(keys)
+        for key in keys:
+            t.delete(key)
+            length -= 1
+            self.assertTrue(t.sanity())
+            self.assertEqual(length, len(t.as_list()))
+            self.assertFalse(t.find(key))  # key should gone
