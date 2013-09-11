@@ -1,6 +1,18 @@
 from tree import Node, Tree
 
 
+class ANode(Node):
+    def is_balance(self):
+        ''' test if a node is balance in AVL rule '''
+        return abs(self.delta()) <= 1
+
+    def delta(self):
+        ''' delta height between left and right branch '''
+        left = self.leftChild.height if self.leftChild else 0
+        right = self.rightChild.height if self.rightChild else 0
+        return left - right
+
+
 class AVLTree(Tree):
     '''
     AVLTree is a typical binary search treee with an additional
@@ -15,7 +27,7 @@ class AVLTree(Tree):
                 if not node:  # end of tree
                     return
                 # delta of two child height should <= 1
-                assert self.balance(node), \
+                assert node.is_balance(), \
                     '%s height delta more than 1' % node.as_tree()
 
                 check_node(node.leftChild)
@@ -27,19 +39,13 @@ class AVLTree(Tree):
             print str(e)
             return False
 
-    def balance(self, node):
-        ''' test if a node is balance in AVL rule '''
-        left = node.leftChild.height if node.leftChild else 0
-        right = node.rightChild.height if node.rightChild else 0
-        return abs(left - right) <= 1
-
     def fixup(self, node):
         if node.parent and node.parent.parent:
             N = node
             P = node.parent
             G = P.parent
             branch = lambda p, c: 'left' if p.leftChild == c else 'right'
-            if not self.balance(G):
+            if not G.is_balance():
                 # unbalance node found.
                 # N is the node which has one extra height, P, G is the parent
                 # and grand parent node of N. if we successfully to elimate
@@ -64,7 +70,7 @@ class AVLTree(Tree):
                 #     / \
                 #    b   c
                 #                 (2)
-                if branch(G, P) != branch(P, N):
+                if P.delta() != 0 and branch(G, P) != branch(P, N):
                     # case 1: G, P, N not in the same side, do a rotation.
                     self.rotate(P, branch(G, P))
                     # assign new P, N in order to move case 2
@@ -76,7 +82,7 @@ class AVLTree(Tree):
                 self.fixup(N.parent)
 
     def insert(self, node_or_key):
-        node = node_or_key if isinstance(node_or_key, Node) else Node(node_or_key)
+        node = node_or_key if isinstance(node_or_key, Node) else ANode(node_or_key)
         if self.rootNode and not self.find(node.key):
             # insert node just like BST way
             node = self.add_as_child(self.rootNode, node)
@@ -91,93 +97,72 @@ class AVLTree(Tree):
             self.rootNode = node
 
     def delete(self, key):
+        def delete_node(node):
+            ''' delete the node from tree,
+            return the deleted node's parent and its original height
+            '''
+            # most copy from Tree.delete_node()
+            if (not node.rightChild) or (not node.leftChild):
+                parent = node.parent
+                height = parent.height if parent else 0
+                child = node.rightChild if node.rightChild else node.leftChild
+                self.replace(node, child)
+            else:
+                successor = self.successor(node.key)
+                parent = successor.parent
+                height = parent.height
+                self.replace(successor, successor.rightChild)
+                node.key, successor.key = successor.key, node.key
+            return (parent, height)
+
         node = self.find(key)
         if node:
-            print 'Tree: %s del %s' % (self.rootNode.as_tree(), node)
-            node, child = self.delete_node(node)
-            # find the bottom node after deletion. Note there is only two case
-            # after deletion(see delete_node's comment).
-            # 1. leaf node is deleted, child is None
-            # 2. a node with only child is deleted.
+            P, h_old = delete_node(node)
 
-            P = child.parent if child else node.parent
-            if not P:
+            # P is the parent of the deleted node.
+            if not P:  # reach the rootNode, return
+                # since node N to be deleted has only two possibility.
+                # 1. N is the leaf
+                # 2. N has only child
+                # if N.parent is None, that is to say N is rootNode, in case 1,
+                # after deletion, tree is emtpy. case 2, N's child become the
+                # new rootNode, as a subtree, it is already meet the rules.
                 return
-            if not self.balance(P):
-                N = P
-                while N.is_leaf():
-                    if N.leftChild.height > N.rightChild.height:
+
+            def unbalance_leaf(node):
+                ''' find the highest child of an unbalance node.
+                if we found such node, we are in the situation like insert.
+                we can call fixup to rebalance tree.
+                '''
+                N = node
+                while not N.is_leaf():
+                    if N.delta() > 0:
                         N = N.leftChild
                     else:
                         N = N.rightChild
-                self.fixup(N)
-            return
-            # find the node which break the AVL rules, then we can simply call
-            # fixup to rebalance tree.
-            if child:
-                # in delete_node case 2 or 3, deleted node has one child.
-                # X is node to be deleted, P is X's parent.
-                # in this case, P must has two children, otherwise, it would
-                # conflict AVL tree rule. so such deletion still keep tree
-                # property, do nothing.
-                #        |                       |
-                #        P                       P
-                #       / \                     / \
-                #      c   X       ----->      c   c'
-                #     / \   \                 / \
-                #    a   b   c'              a   b
-                P = child.parent
-                pass
-            else:  # deleted node is a leaf
-                #           |                   |
-                #           P                   P
-                #          / \     ----->      /
-                #         c   X               c
-                P = node.parent
-                if not P:
-                    return
-                c = P.leftChild if P.leftChild else P.rightChild
-                if not c:
-                    # if X is the only child of P, height decrease by 1, do a
-                    # fixup on P
-                    self.fixup(P)
-                elif c.height == 1:
-                    # c & X are two leaf of P, so deleted X would not change
-                    # height of P
-                    pass
-                else:
-                    # c has a height of 2, delete X make P unbalance.
-                    #           |                         |
-                    #           P                         c
-                    #          /                         / \
-                    #         c           ------>       c0  P
-                    #        / \                             \
-                    #       c0  c1                           c1
-                    # we can do a rotation on P to archive balance on P.
+                return N
 
-                    branch = lambda p, c: 'left' if p.leftChild == c else 'right'
-                    if c.leftChild and c.rightChild:
-                        # c has both two children, a rotation would NOT change
-                        # height of c(new P), so upper subtree don't change,
-                        # we can stop here.
-                        self.rotate(P, 'right' if P.leftChild == c else 'left')
-                    else:
-                        # if c has only one child, we should make sure P, c and c's
-                        # child in the same side, otherwise, a rotation would not
-                        # fixup the height
-                        cc = c.leftChild if c.leftChild else c.rightChild
-                        if branch(P, c) != branch(c, cc):  # not same side
-                            #           |                         |
-                            #           P                         P
-                            #          /                         /
-                            #         c           ------>       cc
-                            #          \                       /
-                            #           cc                    c
-                            P.leftChild, P.rightChild = None, None
-                            c.leftChild, c.rightChild = None, None
-                            self.add_as_child(P, cc)
-                            self.add_as_child(cc, c)
-                            c, cc = cc, c
-                        self.rotate(P, 'right' if P.leftChild == c else 'left')
-                        # c(new P) height has changed, do fixup
-                        self.fixup(c)
+            # we can see the deletion ops in this way: P's subtree and P's
+            # as a subtree of its parent.
+            # There is two case might break down the AVL rules
+            if not P.is_balance():
+                # case 1:
+                # P's subtree is unbalance, we figure out the unbalanced leaf,
+                # then things goes like insertion fixup, it would do a
+                # bottom-up fixup, and no need to care about whether P's height
+                # is changed, since this bottom up traverse has cover this
+                # case.
+                N = unbalance_leaf(P)
+                self.fixup(N)
+            elif h_old != P.height:
+                # case 2:
+                # P's subtree is balanced, whereas P's height has changed.
+                # so P's subtree is OK, we need to check upward.
+                while P and P.is_balance():  # find out first unbalance parent
+                    P = P.parent
+                # height changed does not means balance break down, since AVL
+                # can bear +/-1 height delta
+                if P:
+                    # here, we work just as case 1.
+                    N = unbalance_leaf(P)
+                    self.fixup(N)
