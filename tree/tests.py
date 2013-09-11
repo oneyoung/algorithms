@@ -66,6 +66,9 @@ class TestTree(unittest.TestCase):
         assert all([n.key >= s for n in more.as_list()])
         assert all([n.key <= s for n in less.as_list()])
 
+        from avltree import AVLTree
+        check_tree_sanity(AVLTree)
+
     def test_skiplist(self):
         from skiplist import SkipList
         array = range(100)
