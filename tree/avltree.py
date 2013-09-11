@@ -70,6 +70,32 @@ class AVLTree(Tree):
                 #     / \
                 #    b   c
                 #                 (2)
+
+                # Note here we add a condition that P.delta() != 0
+                # This is because when P's children b & N has the same height,
+                # rotation would make things worse.
+                # (in deletion fixup, we meet this problem)
+                #        3(P)                    5
+                #       / \                     / \
+                #   (b)2   5(N)    ---->       3   6
+                #     /     \                 /
+                #    1       6               2
+                #                           /
+                #                          1
+                # more generally, if h(b) = m ,h(N) = n, h(d) = n - 1, h(P) = m + 1
+                # after rotation (as graph(1)):
+                # h(N) = h(P) + 1 = h(b) + 2 = m + 2
+                # delta(N) = h(d) - h(P) = n - 1 - (m + 1) = n - m + 2
+                # if m = n, delta(N) = 2, N break the AVL rule
+                # that is to say, subtree has violate the rule, not any way
+                # recursive moving upward.
+                # ** for the relation between m and n.
+                # 1. in insert ops, N is always the one who has one extra
+                # child, so n > m
+                # 2. in deletion ops, we might meet P has two child with the
+                # same height, since N is found out by unbalance_leaf(), there
+                # is possiblity to choose right branch till leaf in P, whereas
+                # left branch is another choice.
                 if P.delta() != 0 and branch(G, P) != branch(P, N):
                     # case 1: G, P, N not in the same side, do a rotation.
                     self.rotate(P, branch(G, P))
