@@ -51,3 +51,14 @@ class TestHeap(unittest.TestCase):
         q.sanity()
         q.insert_key(4)
         q.sanity()
+
+    def test_bheap(self):
+        from bheap import BHeap
+        array = range(100)
+        random.shuffle(array)
+        heap = BHeap(array)
+        self.assertTrue(heap.sanity())
+
+        min_node = heap.extract_min()
+        self.assertEqual(0, min_node.key)
+        self.assertTrue(heap.sanity())

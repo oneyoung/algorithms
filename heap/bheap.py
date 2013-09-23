@@ -6,12 +6,17 @@ class Node(object):
         self.child = None
         self.sibling = None
 
+    def __str__(self):
+        return "%s[%s]" % (self.key, self.degree)
+
 
 class BHeap(object):
-    def __init__(self):
+    def __init__(self, keys=[]):
         self.head = None
+        for key in keys:
+            self.insert(key)
 
-    def sanify(self):
+    def sanity(self):
         def check_node(node):
             # check parent node: node's key should bigger than parent's key
             if node.parent:
@@ -20,7 +25,6 @@ class BHeap(object):
                 # to check its sibling
                 if node.sibling:
                     assert node.degree == node.sibling.degree + 1, 'sibling degree not match'
-                    assert node.key < node.sibling.key, 'key bigger than its sibling'
                     check_node(node.sibling)
             # check child node
             if node.degree:
@@ -34,10 +38,11 @@ class BHeap(object):
                 assert count == node.degree, 'child num not equal degree'
 
         node = self.head
-        degree = 0
+        degree = -1
         try:
             while node:
                 assert node.degree > degree, 'degree not ascending'
+                degree = node.degree
                 check_node(node)
                 node = node.sibling
             return True
@@ -128,6 +133,7 @@ class BHeap(object):
                     else:
                         prevx.sibling = nextx
                     link(x, nextx)
+                    x = nextx
                 nextx = x.sibling
             return head
 
@@ -144,7 +150,7 @@ class BHeap(object):
         minval = float('inf')
         minnode = None
         prev = prevmin = None
-        while node.sibling:
+        while node:
             if node.key < minval:
                 prevmin = prev
                 minval = node.key
@@ -163,6 +169,9 @@ class BHeap(object):
             child.parent = None
             child.sibling = None
             childs.append(child)
+            prev = child
+            child = child.sibling
+            prev.sibling = None
         childs.reverse()
 
         # build the new heap and add child to it
@@ -176,6 +185,8 @@ class BHeap(object):
 
         # do a union
         self.union(heap)
+
+        return minnode
 
     def decrease_key(self, node, key):
         assert key > node.key, 'new key greater than original one'
