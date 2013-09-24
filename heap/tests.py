@@ -83,3 +83,13 @@ class TestHeap(unittest.TestCase):
         self.assertTrue(heap.sanity())
         self.assertEqual(heap.extract_min().key, 0)
         self.assertTrue(heap.sanity())
+
+        for i in xrange(30):
+            node = heap.random_pick()
+            heap.decrease_key(node, node.key - 30)
+            self.assertTrue(heap.sanity())
+
+        for i in xrange(10):
+            node = heap.random_pick()
+            heap.delete(node)
+            self.assertTrue(heap.sanity())

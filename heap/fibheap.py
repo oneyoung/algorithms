@@ -47,7 +47,8 @@ class FibHeap(object):
             self._num_nodes += 1
             assert minval <= node.key, 'key small than minval'
             if node.parent:  # check parent node
-                assert node.key > node.parent.key, 'child key small than parent'
+                assert node.key >= node.parent.key, \
+                    'child %s key small than parent %s' % (node, node.parent)
             # check sibling
             if first:
                 for sibling in dlink2list(node):
@@ -91,9 +92,10 @@ class FibHeap(object):
     def _remove_node(node, destory=True):
         ''' remove node '''
         left, right = node.left, node.right
-        if left != right:  # node has sibling
+        if left != node:  # node has sibling
             left.right = right
             right.left = left
+        node.parent = None
         if destory:
             node.left = node.right = None
         else:
@@ -127,6 +129,7 @@ class FibHeap(object):
                 master.child = sub
             sub.parent = master
             master.degree += 1
+            master.mark = False
 
         import math
         size = int(math.ceil(math.log(self.num, 2)))
@@ -180,3 +183,56 @@ class FibHeap(object):
         self.num -= 1
 
         return min_node
+
+    def random_pick(self):
+        ''' random pick a node '''
+        import random
+        node = self.min
+        while random.randint(0, 6):
+            l = dlink2list(node)
+            index = random.randrange(0, len(l))
+            node = l[index]
+            if not node.child:
+                break
+            else:
+                node = node.child
+        return node
+
+    def decrease_key(self, node, key):
+        def cut(x, y):
+            ''' remove x from the child list of y and add x to rootlist '''
+            if y.child == x:
+                # y's child pointer happen pointer to x
+                # must re-asssign chld pointer
+                if x == x.right:  # x is the only child
+                    y.child = None
+                else:
+                    y.child = x.right
+            self._remove_node(x, False)
+            self._root_add(x)
+            x.mark = False
+            y.degree -= 1
+
+        def cascade_cut(y):
+            ''' this ops wants to achive expected time boundary '''
+            p = y.parent
+            if p:
+                if not y.mark:
+                    y.mark = True
+                else:
+                    cut(y, p)
+                    cascade_cut(p)
+
+        assert key < node.key, 'key bigger than original'
+
+        p = node.parent
+        node.key = key
+        if p and p.key > node.key:
+            cut(node, p)
+            cascade_cut(p)
+        if node.key < self.min.key:
+            self.min = node
+
+    def delete(self, node):
+        self.decrease_key(node, float('-inf'))
+        self.extract_min()
