@@ -62,3 +62,24 @@ class TestHeap(unittest.TestCase):
         min_node = heap.extract_min()
         self.assertEqual(0, min_node.key)
         self.assertTrue(heap.sanity())
+
+    def test_fibheap(self):
+        from fibheap import FibHeap
+        array = range(100)
+        random.shuffle(array)
+        heap = FibHeap(array)
+        self.assertTrue(heap.sanity())
+
+        self.assertEqual(heap.extract_min().key, 0)
+        self.assertTrue(heap.sanity())
+        self.assertEqual(heap.extract_min().key, 1)
+        self.assertTrue(heap.sanity())
+        self.assertEqual(heap.extract_min().key, 2)
+        self.assertTrue(heap.sanity())
+
+        heap.insert(1023)
+        self.assertTrue(heap.sanity())
+        heap.insert(0)
+        self.assertTrue(heap.sanity())
+        self.assertEqual(heap.extract_min().key, 0)
+        self.assertTrue(heap.sanity())
