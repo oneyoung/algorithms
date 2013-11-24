@@ -3,6 +3,9 @@ import math
 
 
 def insert_sort(array):
+    ''' insert sort
+        T(n) = O(n^2)
+    '''
     l = len(array)
     for i in xrange(0, l):
         for j in xrange(i, l):
@@ -29,6 +32,9 @@ def insert_sort2(array):
 
 
 def merge_sort(array):
+    ''' merge sort
+        T(n) = O(n*log(n))
+    '''
     def merge(a1, a2):
         ''' merge two sorted list into one '''
         ret = []
@@ -66,6 +72,8 @@ def partition(array, i_left, i_right, i_pivot):
 def quick_sort(array):
     '''
     in-place quick sort
+    worse case: T(n) = O(n^2)
+    randomize case: T(n) = O(n*log(n))
     '''
     def quicksort(array, i_left, i_right):
         if i_left < i_right:
@@ -94,6 +102,10 @@ def quick_sort2(array):
 
 
 def counting_sort(array):
+    ''' counting sort
+        T(n) = O(n)
+        but need a huge array if range(min, max) is very large
+    '''
     # init a empty aux array
     m = max(array)
     n = min(array)
@@ -117,6 +129,10 @@ def counting_sort(array):
 
 
 def radix_sort(array):
+    ''' radix sort
+        a branch of counting sort
+        T(n) = O(n)
+    '''
     def csort(array, shift, mask):
         '''
         another type of counting sort.
@@ -152,10 +168,11 @@ def radix_sort(array):
 
 
 def bucket_sort(array, size=10):
-    ''' bucker sort
+    ''' bucker sort T(n) = O(n)
     para:
         array -- list to be sorted
         size -- size of bucket, default is 10
+    need array to randomized distribute
     '''
     # init empty buckets
     # should not use [[]] * size, because inner [] refer to the same empty
