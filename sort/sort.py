@@ -4,8 +4,8 @@ import math
 
 def insert_sort(array):
     l = len(array)
-    for i in range(0, l):
-        for j in range(i, l):
+    for i in xrange(0, l):
+        for j in xrange(i, l):
             if array[i] > array[j]:
                 array.insert(i, array.pop(j))
 
@@ -55,7 +55,7 @@ def partition(array, i_left, i_right, i_pivot):
     # first swap pivot to right most element
     array[i_right], array[i_pivot] = array[i_pivot], array[i_right]
     i_stored = i_left
-    for i in range(i_left, i_right):  # i_left <= i < i_right
+    for i in xrange(i_left, i_right):  # i_left <= i < i_right
         if array[i] < pivot:  # if i < pivot, move to left side
             array[i], array[i_stored] = array[i_stored], array[i]
             i_stored += 1  # once we found a match, move 1 forward
@@ -104,7 +104,7 @@ def counting_sort(array):
 
     # generate index map of aux
     s = 0
-    for i in range(len(aux)):
+    for i in xrange(len(aux)):
         s += aux[i]
         aux[i] = s
 
@@ -131,7 +131,7 @@ def radix_sort(array):
 
         # generate index map of aux
         s = 0
-        for i in range(len(aux)):
+        for i in xrange(len(aux)):
             s += aux[i]
             aux[i] = s
 
@@ -145,7 +145,7 @@ def radix_sort(array):
     r = int(math.log(len(array), 2))  # slicer
     b = int(math.ceil(math.log(max(array), 2)))  # max bits
     mask = (2 ** r) - 1
-    for i in range(int(b / r) + 1):
+    for i in xrange(int(b / r) + 1):
         shift = i * r
         array = csort(array, shift, mask)
     return array
@@ -160,7 +160,7 @@ def bucket_sort(array, size=10):
     # init empty buckets
     # should not use [[]] * size, because inner [] refer to the same empty
     # list, so each insert to that list would apply to all lists
-    buckets = [[] for i in range(size)]
+    buckets = [[] for i in xrange(size)]
 
     # here we want to build a generic bucket sort apply to any intergers, so
     # need to figure out the range of the array
@@ -198,7 +198,7 @@ def list_range(array):
         m = n = array[0]
         start = 1
 
-    for i in range(start, length, 2):
+    for i in xrange(start, length, 2):
         x = array[i]
         y = array[i + 1]
         mi, ni = (x, y) if x > y else (y, x)
