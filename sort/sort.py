@@ -12,6 +12,22 @@ def insert_sort(array):
     return array
 
 
+def insert_sort2(array):
+    ''' insert sort without list insert support
+        cache friendly, inplace sort, but slower
+    '''
+    l = len(array)
+    for i in xrange(0, l - 1):
+        # the head ith array has been sorted
+        # insert one element[i+1] into the sorted list
+        j = i + 1
+        for k in xrange(0, j):
+            # each loop need to compare all prev sorted array, slower
+            if array[k] > array[j]:
+                array[k], array[j] = array[j], array[k]
+    return array
+
+
 def merge_sort(array):
     def merge(a1, a2):
         ''' merge two sorted list into one '''

@@ -8,6 +8,7 @@ import sort
 class TestSort(unittest.TestCase):
     def setUp(self):
         self.funcs = ['insert_sort',
+                      'insert_sort2',
                       'merge_sort',
                       'quick_sort',
                       'counting_sort',
