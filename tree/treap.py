@@ -80,7 +80,6 @@ class Treap(Tree):
             # NOTE: if we do rotation, the node becomes parent of node.parent,
             # that is to say, node becomes new parent, so we should not do node
             # = node.parent.
-        self.sanity()
 
     def delete(self, key):
         # delete one node from tree, just as BST:
